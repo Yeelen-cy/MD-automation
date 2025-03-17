@@ -1,0 +1,191 @@
+6GC
+                    3D
+ Schrodinger Suite 2021-2.
+ 49 51  0  0  1  0            999 V2000
+    0.0920   38.0230  -24.6890 C   0  0  0  0  0  0
+   -0.3750   33.1730  -23.1650 C   0  0  0  0  0  0
+   -1.6520   33.4700  -23.6440 C   0  0  0  0  0  0
+    0.8110   33.6700  -23.8650 C   0  0  0  0  0  0
+   -0.6750   35.6050  -26.6490 C   0  0  0  0  0  0
+   -0.4010   37.3680  -27.9300 C   0  0  0  0  0  0
+    0.6420   37.4450  -25.8300 C   0  0  0  0  0  0
+    2.2100   38.6950  -23.7750 C   0  0  0  0  0  0
+    2.2490   33.3670  -23.5020 C   0  0  0  0  0  0
+    4.8600   32.0010  -25.1690 C   0  0  0  0  0  0
+    6.9100   31.5660  -26.5190 C   0  0  0  0  0  0
+   -1.7920   34.2600  -24.7860 C   0  0  0  0  0  0
+   -0.5900   34.7380  -25.4770 C   0  0  0  0  0  0
+    0.6470   34.4260  -24.9860 C   0  0  0  0  0  0
+   -1.4020   35.3850  -27.7800 N   0  0  0  0  0  0
+   -0.1200   36.8410  -26.7620 N   0  0  0  0  0  0
+   -3.0020   34.5790  -25.3110 O   0  5  0  0  0  0
+   -0.2020   32.4230  -22.0540 O   0  0  0  0  0  0
+   -1.1860   36.5170  -28.5790 N   0  0  0  0  0  0
+    0.0000   38.5170  -28.3110 O   0  0  0  0  0  0
+    2.1030   37.5390  -25.9060 C   0  0  0  0  0  0
+    2.8460   38.1470  -24.8930 C   0  0  0  0  0  0
+    2.7550   32.1640  -23.8240 N   0  0  0  0  0  0
+    2.9340   34.2370  -23.0180 O   0  0  0  0  0  0
+    4.2020   31.7900  -23.7930 C   0  0  0  0  0  0
+    0.8290   38.6250  -23.6700 C   0  0  0  0  0  0
+    1.8890   31.0690  -24.2290 C   0  0  0  0  0  0
+    6.0860   31.1070  -25.3450 C   0  0  0  0  0  0
+    2.6690   37.0180  -27.0030 F   0  0  0  0  0  0
+   -0.9830   37.9670  -24.5660 H   0  0  0  0  0  0
+   -2.5290   33.1070  -23.1210 H   0  0  0  0  0  0
+    2.7910   39.1770  -22.9990 H   0  0  0  0  0  0
+    4.1366   31.7606  -25.9621 H   0  0  0  0  0  0
+    5.1765   33.0499  -25.2671 H   0  0  0  0  0  0
+    7.7870   30.9113  -26.6298 H   0  0  0  0  0  0
+    7.2437   32.6006  -26.3506 H   0  0  0  0  0  0
+    6.3012   31.5214  -27.4341 H   0  0  0  0  0  0
+    1.5250   34.7910  -25.5050 H   0  0  0  0  0  0
+   -1.0763   32.0371  -21.5092 H   0  0  0  0  0  0
+   -1.5529   36.7654  -29.5858 H   0  0  0  0  0  0
+    3.9230   38.2140  -24.9840 H   0  0  0  0  0  0
+    4.2852   30.7316  -23.5052 H   0  0  0  0  0  0
+    4.7104   32.4147  -23.0438 H   0  0  0  0  0  0
+    0.3270   39.0430  -22.8070 H   0  0  0  0  0  0
+    0.8432   31.4100  -24.2307 H   0  0  0  0  0  0
+    2.0009   30.2327  -23.5232 H   0  0  0  0  0  0
+    2.1676   30.7357  -25.2396 H   0  0  0  0  0  0
+    6.7044   31.1496  -24.4363 H   0  0  0  0  0  0
+    5.7619   30.0704  -25.5197 H   0  0  0  0  0  0
+  1 26  1  0  0  0
+  1  7  2  0  0  0
+  1 30  1  0  0  0
+  2 18  1  0  0  0
+  2  3  2  0  0  0
+  2  4  1  0  0  0
+  3 12  1  0  0  0
+  3 31  1  0  0  0
+  4  9  1  0  0  0
+  4 14  2  0  0  0
+  5 13  1  0  0  0
+  5 16  1  0  0  0
+  5 15  2  0  0  0
+  6 16  1  0  0  0
+  6 20  2  0  0  0
+  6 19  1  0  0  0
+  7 21  1  0  0  0
+  7 16  1  0  0  0
+  8 26  2  0  0  0
+  8 22  1  0  0  0
+  8 32  1  0  0  0
+  9 24  2  0  0  0
+  9 23  1  0  0  0
+ 10 25  1  0  0  0
+ 10 28  1  0  0  0
+ 10 33  1  0  0  0
+ 10 34  1  0  0  0
+ 11 28  1  0  0  0
+ 11 35  1  0  0  0
+ 11 36  1  0  0  0
+ 11 37  1  0  0  0
+ 12 17  1  0  0  0
+ 12 13  2  0  0  0
+ 13 14  1  0  0  0
+ 14 38  1  0  0  0
+ 15 19  1  0  0  0
+ 18 39  1  0  0  0
+ 19 40  1  0  0  0
+ 21 22  2  0  0  0
+ 21 29  1  0  0  0
+ 22 41  1  0  0  0
+ 23 25  1  0  0  0
+ 23 27  1  0  0  0
+ 25 42  1  0  0  0
+ 25 43  1  0  0  0
+ 26 44  1  0  0  0
+ 27 45  1  0  0  0
+ 27 46  1  0  0  0
+ 27 47  1  0  0  0
+ 28 48  1  0  0  0
+ 28 49  1  0  0  0
+M  CHG  1  17  -1
+M  END
+> <model_server_result.job_id>
+POvy62ru2OY8NwXKBdN6eg
+
+> <model_server_result.datetime_utc>
+2025-03-17 08:40:42
+
+> <model_server_result.server_version>
+0.9.12
+
+> <model_server_result.query_name>
+ligand
+
+> <model_server_result.source_id>
+pdb-bcif
+
+> <model_server_result.entry_id>
+5j9x
+
+> <model_server_params.name>
+atom_site
+
+> <model_server_params.value>
+{"label_asym_id":"B","auth_seq_id":301}
+
+> <model_server_stats.io_time_ms>
+33
+
+> <model_server_stats.parse_time_ms>
+13
+
+> <model_server_stats.create_model_time_ms>
+5
+
+> <model_server_stats.query_time_ms>
+413
+
+> <model_server_stats.encode_time_ms>
+0
+
+> <model_server_stats.element_count>
+50
+
+> <s_m_source_file>
+../wget-ligand-expo/5j9x_B_6GC.sdf
+
+> <i_m_source_file_index>
+1
+
+> <i_lp_mmshare_version>
+54117
+
+> <s_epik_input>
+RmMxW2NIXVtjSF1bY0hdW2NIXWMxLW4yYyg9TylbbkhdbmMyLWMoYyhbT0hdKVtjSF1jM1tPSF0pW2NIXWMzQyg9TylOKFtDSDNdKVtDSDJdW0NIMl1bQ0gyXVtDSDNd
+
+> <s_epik_cmdline>
+J2VwaWtfcHl0aG9uJywgJy1waHQnLCAnMC4wJywgJy1waCcsICc3LjQnLCAnLW50JywgJy1tYScsICcyMDAnLCAnLWltYWUnLCAnPGluZmlsZS5tYWU+JywgJy1vbWFlJywgJzxvdXRmaWxlLm1hZT4n
+
+> <r_lp_tautomer_probability>
+0.9999
+
+> <r_epik_Ionization_Penalty>
+0.327294
+
+> <r_epik_Ionization_Penalty_Charging>
+0.319241
+
+> <r_epik_Ionization_Penalty_Neutral>
+0.00805342
+
+> <r_epik_State_Penalty>
+0.567742
+
+> <r_epik_Charging_Adjusted_Penalty>
+0.886982
+
+> <i_epik_Tot_Q>
+-1
+
+> <i_epik_Tot_abs_Q>
+1
+
+> <s_lp_Variant>
+6GC-1
+
+$$$$
