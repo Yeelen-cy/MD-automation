@@ -1,0 +1,34 @@
+OMP: Warning #181: OMP_STACKSIZE: ignored because KMP_STACKSIZE has been defined
+--------------------------------------------------------------------------------
+JobId          : localhost-0-67d83f37
+Name           : 5lr7-73J
+Program        : LigPrep
+Host           : localhost.localdomain
+Dir            : /home/databank_70t/zzy/project/koff/smd/hsp90/33sys/pdb/ligand/epik-schrodinger2021
+HostEntry      : localhost
+JobHost        : localhost.localdomain
+JobDir         : /home/dddc/software/Schrodinger_Suites_2021-2/tmp/dddc/5lr7-73J
+JobSchrodinger : /home/dddc/software/Schrodinger_Suites_2021-2
+Commandline    : /home/dddc/software/Schrodinger_Suites_2021-2/ligprep -R e -epik -ph 7.4 -pht 0.0 -isd ../wget-ligand-expo/73J_model.sdf -osd 5lr7-73J.sdf
+StartTime      : 2025-03-17-23:26:47
+--------------------------------------------------------------------------------
+LigPrep (version 58117). Copyright Schrodinger, LLC. All rights reserved.
+
+LigPrep command:
+$SCHRODINGER/ligprep -R e -epik -ph 7.4 -pht 0.0 -isd ../wget-ligand-expo/73J_model.sdf -osd 5lr7-73J.sdf
+
+Processing steps:
+$DO.sdconvert_in -bad -orig_file_index 0 -orig_file ../wget-ligand-expo/73J_model.sdf 73J_model.sdf
+$DO.sdstereoexpander -add_hydrogens -max_output 32 -max_generated 1024 <infile.mae> <outfile.mae>
+$DO.epik.py -pht 0.0 -ph 7.4 -nt -ma 200 -imae <infile.mae> -omae <outfile.mae>
+
+DO=$SCHRODINGER/run python3 -m schrodinger.application.macromodel.packages.ligprep3
+
+# counts of output and dropped structures after processing steps
+# index  sdstex   epik   title
+       1   1/0     1/0   '73J'
+
+# of processed structures in "5lr7-73J.sdf" : 1
+# of dropped structures in "5lr7-73J-dropped.sdf" : 0
+
+backend run time: 0 hours 0 minutes 1.881 seconds
