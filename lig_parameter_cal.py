@@ -94,7 +94,7 @@ class Sdffiles:
             lines = file.readlines()
             for line in lines:
                 if line.startswith("M  CHG"):
-                    charged_info = line.split()[2]
+                    charged_info = line.split()[4]
                     return charged_info
             return "0"
 
