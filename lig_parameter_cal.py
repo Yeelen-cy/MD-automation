@@ -109,17 +109,25 @@ class Logfiles:
     def check_logfiles(self):
 
         failed_files = []
+        continued_files = []
         for log_file in self.log_file_list:
             try:
                 with open(log_file, 'r') as file:
+                    content = file.read()
+                with open(log_file, 'r') as file:
                     last_line = file.readlines()[-1].strip()
-                    if not last_line.startswith("Normal termination"):
+                    if 'Error termination' in content:
                         failed_files.append(os.path.basename(log_file) + " failed")
+                    elif not last_line.startswith("Normal termination"):
+                        continued_files.append(os.path.basename(log_file) + " continued")
+                        
             except Exception as e:
                 print(f"Error reading {log_file}: {e}")
 
         if failed_files:
             print("\n".join(failed_files))
+        if continued_files:
+            print("\n".join(continued_files))
         else:
             print("All files succeed.")
 
