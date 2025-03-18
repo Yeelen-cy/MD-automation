@@ -113,9 +113,9 @@ class Logfiles:
         for log_file in self.log_file_list:
             try:
                 with open(log_file, 'r') as file:
-                    content = file.read()
-                with open(log_file, 'r') as file:
-                    last_line = file.readlines()[-1].strip()
+                    lines = file.readlines()  # 读取所有行
+                    content = ''.join(lines)  # 获取文件的全部内容
+                    last_line = lines[-1].strip()
                     if 'Error termination' in content:
                         failed_files.append(os.path.basename(log_file) + " failed")
                     elif not last_line.startswith("Normal termination"):
