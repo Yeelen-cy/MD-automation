@@ -10,7 +10,6 @@
 
 
 
-
 import os
 import sys
 import logging
@@ -22,7 +21,6 @@ import subprocess
 work_path = "system1/parameter/PZY"
 os.makedirs(work_path, exist_ok=True)
 
-# 设置日志等级为 DEBUG
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 
@@ -49,8 +47,8 @@ def position_restraint():
 
     if not os.path.exists(top_file):
         logging.info("gmx.top not found. Attempting auto-conversion...")
-        default_prmtop = "complex.prmtop"
-        default_inpcrd = "complex.inpcrd"
+        default_prmtop = os.path.join(work_path,"complex.prmtop")
+        default_inpcrd = os.path.join(work_path,"complex.inpcrd")
         if not os.path.exists(default_prmtop) or not os.path.exists(default_inpcrd):
             logging.error("Default AMBER files missing.")
             sys.exit(1)
@@ -104,7 +102,6 @@ def generate_position_restraint():
     mol_output_itp = os.path.join(work_path, "posre2.itp")
     mol_atom_count = None
 
-    # Step 1: 查找 Protein 和 MOL 的 group index + atom count
     try:
         process = subprocess.Popen(
             ["gmx_mpi", "genrestr", "-f", gro_file, "-o", os.devnull],
@@ -118,17 +115,16 @@ def generate_position_restraint():
 
         protein_group = None
         for line in output.splitlines():
-            if "Protein" in line and "Group" in line:
-                match = re.search(r"Group\s+(\d+)\s+\(\s*Protein", line)
-                if match:
-                    protein_group = match.group(1)
-                    logging.debug(f"Detected Protein group index: {protein_group}")
+            logging.debug(f"Group line: {line}")
+            match = re.search(r"Group\s+(\d+)\s+\(\s*Protein\s*\)", line)
+            if match:
+                protein_group = match.group(1)
+                logging.info(f"Detected Protein group index: {protein_group}")
 
-            if "MOL" in line and "Group" in line:
-                match = re.search(r"MOL\)\s+has\s+(\d+)\s+elements", line)
-                if match:
-                    mol_atom_count = int(match.group(1))
-                    logging.debug(f"Detected MOL atom count: {mol_atom_count}")
+            match2 = re.search(r"Group\s+\d+\s+\(\s*MOL\s*\)\s+has\s+(\d+)\s+elements", line)
+            if match2:
+                mol_atom_count = int(match2.group(1))
+                logging.info(f"Detected MOL atom count: {mol_atom_count}")
 
         if not protein_group:
             logging.warning("Protein group not found, defaulting to 1.")
@@ -138,7 +134,6 @@ def generate_position_restraint():
         logging.error(f"Failed to parse group info: {e}")
         protein_group = "1"
 
-    # Step 2: 生成 posre1.itp for Protein
     try:
         subprocess.run(
             ["gmx_mpi", "genrestr", "-f", gro_file, "-o", output_itp],
@@ -151,7 +146,6 @@ def generate_position_restraint():
         logging.error(f"Failed to generate posre1.itp: {e}")
         return
 
-    # Step 3: 截取前 N+4 行生成 posre2.itp for MOL
     if mol_atom_count is not None:
         try:
             with open(output_itp, "r") as f:
@@ -173,8 +167,8 @@ def generate_position_restraint():
 def main():
     if len(sys.argv) < 2 or sys.argv[1] not in ["0", "1"]:
         logging.error("Usage:")
-        logging.error("  python amber_to_gmx-add_restraint_debug.py 0 <prmtop> <inpcrd>")
-        logging.error("  python amber_to_gmx-add_restraint_debug.py 1")
+        logging.error("  python amber_to_gmx-add_restraint_final.py 0 <prmtop> <inpcrd>")
+        logging.error("  python amber_to_gmx-add_restraint_final.py 1")
         sys.exit(1)
 
     mode = sys.argv[1]
