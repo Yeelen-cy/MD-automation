@@ -1,3 +1,16 @@
+# Function1: "Converting Amber data to GROMACS data using python"
+# Function2: "Add position restraints to the gmx.top file"
+# Usage: python amber_to_gmx-add_restraint.py [system] (0 for Convert AMBER to GROMACS; 1 Add position restraint and Generate position restraint file)
+# Required files:
+#           (1) Amber files: complex.inpcrd, complex.prmtop (for mode 0)
+#           (2) GROMACS file: gmx.top (for mode 1)
+# Author: 1615326468@qq.com
+# Released: 2025-03-18
+# Updata record: 2025-03-21: Generate position restraint file and Unified work path
+
+
+
+
 import os
 import sys
 import logging
