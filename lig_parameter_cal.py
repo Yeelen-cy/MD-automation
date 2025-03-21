@@ -3,6 +3,8 @@ import argparse
 import subprocess
 
 """
+写在最前面：由于高斯运行时的临时文件特别大且未正常结束时不会自动删除，切勿经常大批量kill高斯任务。
+
 Usage:
     python lig_parameter_cal.py -i <input_directory> -t <file_type>
     python lig_parameter_cal.py -c -i <input_directory>  
@@ -92,12 +94,27 @@ class Sdffiles:
     def get_charged(filepath):
         with open(filepath, 'r') as file:
             lines = file.readlines()
+            charged_info = 0
             for line in lines:
                 if line.startswith("M  CHG"):
-                    charged_info = line.split()[4]
+                    num = int(line.split()[2])
+                    info = line.split()[2:]
+                    for i in range(num):
+                        charged_info += int(info[2*(i+1)])
+                    charged_info = str(charged_info)
                     return charged_info
             return "0"
 
+class Gjffiles:
+
+    @staticmethod
+    def modify_gjf(filepath):
+        with open(filepath, 'r') as file:
+            lines = file.readlines()
+        filtered_lines = [line for i, line in enumerate(lines) if i not in [0, 2]]
+        with open(filepath, "w") as f:
+            f.writelines(filtered_lines)
+        return filepath
 
 class Logfiles:
 
@@ -152,6 +169,7 @@ class BatchRun:
 
         for filepath in self.origin_file_list:
             gjf_file = Tools.run_antechamber(filepath, self.filetype)
+            gjf_file = Gjffiles.modify_gjf(gjf_file)
             if not gjf_file or not os.path.exists(gjf_file):
                 print(f"Skipping {filepath} due to antechamber failed.")
                 continue
