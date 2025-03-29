@@ -16,43 +16,37 @@ import logging
 import re
 import parmed as pmd
 import subprocess
-
-# 固定工作目录
-work_path = "system1/parameter/PZY"
-os.makedirs(work_path, exist_ok=True)
+import glob
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
-
-def amber_to_gmx(prmtop_file, inpcrd_file):
+def amber_to_gmx(prmtop_file, inpcrd_file, work_path):
     top_file = os.path.join(work_path, "gmx.top")
     gro_file = os.path.join(work_path, "gmx.gro")
 
     if not os.path.exists(prmtop_file) or not os.path.exists(inpcrd_file):
-        logging.error("AMBER input files missing.")
-        sys.exit(1)
+        logging.error(f"AMBER input files missing in {work_path}")
+        return
 
     try:
         amber = pmd.load_file(prmtop_file, inpcrd_file)
         amber.save(top_file, format="gromacs")
         amber.save(gro_file, format="gro")
-        logging.info(f"Converted: {top_file}, {gro_file}")
+        logging.info(f"[{work_path}] Converted: gmx.top, gmx.gro")
     except Exception as e:
-        logging.exception("AMBER to GROMACS conversion failed")
-        sys.exit(1)
+        logging.exception(f"[{work_path}] AMBER to GROMACS conversion failed")
 
-
-def position_restraint():
+def position_restraint(work_path):
     top_file = os.path.join(work_path, "gmx.top")
 
     if not os.path.exists(top_file):
-        logging.info("gmx.top not found. Attempting auto-conversion...")
-        default_prmtop = os.path.join(work_path,"complex.prmtop")
-        default_inpcrd = os.path.join(work_path,"complex.inpcrd")
+        logging.info(f"[{work_path}] gmx.top not found. Attempting auto-conversion...")
+        default_prmtop = os.path.join(work_path, "complex.prmtop")
+        default_inpcrd = os.path.join(work_path, "complex.inpcrd")
         if not os.path.exists(default_prmtop) or not os.path.exists(default_inpcrd):
-            logging.error("Default AMBER files missing.")
-            sys.exit(1)
-        amber_to_gmx(default_prmtop, default_inpcrd)
+            logging.error(f"[{work_path}] Default AMBER files missing.")
+            return
+        amber_to_gmx(default_prmtop, default_inpcrd, work_path)
 
     posres_protein = '; Include Position restraint file\n#ifdef  POSRES\n#include "posre1.itp"\n#endif\n\n'
     posres_mol = '; Include Position restraint file\n#ifdef  POSRES\n#include "posre2.itp"\n#endif\n\n'
@@ -77,26 +71,24 @@ def position_restraint():
                         lines.insert(i, posres_protein)
                         found_protein = True
                         modified = True
-                        logging.info("Added position restraint to protein.")
+                        logging.info(f"[{work_path}] Added position restraint to protein.")
 
                 if line1.split()[0] in ["Na+", "Cl-"] or line2.split()[0] in ["Na+", "Cl-"]:
                     if not lines[i-1].strip() == posres_mol.strip():
                         lines.insert(i, posres_mol)
                         found_ion = True
                         modified = True
-                        logging.info("Added position restraint to small molecule.")
+                        logging.info(f"[{work_path}] Added position restraint to small molecule.")
         i += 1
 
     if modified:
         with open(top_file, "w") as f:
             f.writelines(lines)
-        logging.info(f"Updated: {top_file}")
+        logging.info(f"[{work_path}] Updated gmx.top with restraints.")
     else:
-        logging.info("No restraints added.")
+        logging.info(f"[{work_path}] No restraints added.")
 
-
-def generate_position_restraint():
-    """Generate posre1.itp (Protein) and posre2.itp (MOL) based on atom counts."""
+def generate_position_restraint(work_path):
     gro_file = os.path.join(work_path, "gmx.gro")
     output_itp = os.path.join(work_path, "posre1.itp")
     mol_output_itp = os.path.join(work_path, "posre2.itp")
@@ -115,23 +107,22 @@ def generate_position_restraint():
 
         protein_group = None
         for line in output.splitlines():
-            logging.debug(f"Group line: {line}")
             match = re.search(r"Group\s+(\d+)\s+\(\s*Protein\s*\)", line)
             if match:
                 protein_group = match.group(1)
-                logging.info(f"Detected Protein group index: {protein_group}")
+                logging.info(f"[{work_path}] Protein group index: {protein_group}")
 
             match2 = re.search(r"Group\s+\d+\s+\(\s*MOL\s*\)\s+has\s+(\d+)\s+elements", line)
             if match2:
                 mol_atom_count = int(match2.group(1))
-                logging.info(f"Detected MOL atom count: {mol_atom_count}")
+                logging.info(f"[{work_path}] MOL atom count: {mol_atom_count}")
 
         if not protein_group:
-            logging.warning("Protein group not found, defaulting to 1.")
+            logging.warning(f"[{work_path}] Protein group not found, defaulting to 1.")
             protein_group = "1"
 
     except Exception as e:
-        logging.error(f"Failed to parse group info: {e}")
+        logging.error(f"[{work_path}] Failed to parse group info: {e}")
         protein_group = "1"
 
     try:
@@ -141,9 +132,9 @@ def generate_position_restraint():
             text=True,
             check=True
         )
-        logging.info(f"posre1.itp generated: {output_itp}")
+        logging.info(f"[{work_path}] posre1.itp generated.")
     except subprocess.CalledProcessError as e:
-        logging.error(f"Failed to generate posre1.itp: {e}")
+        logging.error(f"[{work_path}] Failed to generate posre1.itp: {e}")
         return
 
     if mol_atom_count is not None:
@@ -151,18 +142,15 @@ def generate_position_restraint():
             with open(output_itp, "r") as f:
                 lines = f.readlines()
 
-            logging.debug(f"Total lines in posre1.itp: {len(lines)}")
             mol_lines = lines[:mol_atom_count + 4]
             with open(mol_output_itp, "w") as f:
                 f.writelines(mol_lines)
 
-            logging.info(f"posre2.itp (small molecule restraints) written: {mol_output_itp}")
-            logging.debug(f"Written lines to posre2.itp: {len(mol_lines)}")
+            logging.info(f"[{work_path}] posre2.itp generated.")
         except Exception as e:
-            logging.error(f"Failed to generate posre2.itp: {e}")
+            logging.error(f"[{work_path}] Failed to generate posre2.itp: {e}")
     else:
-        logging.warning("MOL atom count not found; posre2.itp not generated.")
-
+        logging.warning(f"[{work_path}] MOL atom count not found; posre2.itp not generated.")
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1] not in ["0", "1"]:
@@ -173,18 +161,22 @@ def main():
 
     mode = sys.argv[1]
 
-    if mode == "0":
-        if len(sys.argv) != 4:
-            logging.error("Missing arguments: prmtop and inpcrd")
-            sys.exit(1)
-        prmtop_file = sys.argv[2]
-        inpcrd_file = sys.argv[3]
-        amber_to_gmx(prmtop_file, inpcrd_file)
+    for path in glob.glob("system*/parameter/"):
+        work_path = path
+        logging.info(f"Processing path: {work_path}")
+        os.makedirs(work_path, exist_ok=True)
 
-    elif mode == "1":
-        position_restraint()
-        generate_position_restraint()
+        if mode == "0":
+            if len(sys.argv) != 4:
+                logging.error("Missing arguments: prmtop and inpcrd")
+                sys.exit(1)
+            prmtop_file = sys.argv[2]
+            inpcrd_file = sys.argv[3]
+            amber_to_gmx(prmtop_file, inpcrd_file, work_path)
 
+        elif mode == "1":
+            position_restraint(work_path)
+            generate_position_restraint(work_path)
 
 if __name__ == "__main__":
     main()
