@@ -4,18 +4,22 @@
 This automated workflow handles the complete preparation process for molecular dynamics simulations, including ligand parameterization, system setup, and pre-equilibration. The `total_control.py` script serves as the master controller for the entire pipeline.
 
 ## System Requirements
-- Python 3.x
-- AMBER tools (for RESP charge calculations)
-- GROMACS (for MD parameter generation)
-- Required Python packages: logging, subprocess, os, sys, glob
 
 ## Directory Structure
 The workflow expects the following structure:
 ```
 project_root/
 ├── total_control.py
+├── lig_parameter_cal.py
+├── lig_resp_cal.py
+├── atom_name_check.py
+├── md_parm_gen.py
+├── amber_to_gmx-add_restraint.py
+├── pre_equ.py
 ├── system1/          # System folder 1
 ├── system2/          # System folder 2
+│   ├── system2.sdf   # Original Ligand File
+│   ├── system1.pdb   # Initial Protein
 │   ├── ligprep/      # Auto-created for ligand prep files
 │   ├── parameters/   # Auto-created for parameter files
 │   └── mdp/          # Auto-created for MD parameter files
@@ -39,18 +43,18 @@ project_root/
 The complete workflow executes these steps in order:
 
 1. **Ligand Parameter Calculation** (`lig_parameter_cal.py`)
-   - Processes all `.sdf` files in system directories
+   - Processes all .sdf files in system directories
    - Generates initial ligand parameters
 
 2. **RESP Charge Calculation** (`lig_resp_cal.py`)
-   - Calculates RESP charges for ligands
-   - Uses AMBER tools for quantum calculations
+   - Charge calculation
+   - Parameter generation
 
 3. **Atom Name Validation** (`atom_name_check.py`)
-   - Ensures consistent atom naming between components
+   - Ligand atom name check
 
 4. **MD Parameter Generation** (`md_parm_gen.py`)
-   - Generates force field parameters for the system
+   - Generates amber field parameters for the system
    - Different handling for protein-only vs. complex systems
 
 5. **AMBER to GROMACS Conversion** (`amber_to_gmx-add_restraint.py`)
@@ -66,12 +70,12 @@ Each step can be run independently if needed:
 
 ### 1. Ligand Parameter Calculation
 ```bash
-python lig_parameter_cal.py -i [input.sdf] -t sdf
+python lig_parameter_cal.py -i <input_directory> -t <file_type>
 ```
 
 ### 2. RESP Charge Calculation
 ```bash
-python lig_resp_cal.py -i [ligprep_directory]
+python script_name.py -i <input_directory>
 ```
 
 ### 3. Atom Name Validation
@@ -87,7 +91,7 @@ python md_parm_gen.py [0|1]
 
 ### 5. AMBER to GROMACS Conversion
 ```bash
-python amber_to_gmx-add_restraint.py 1
+python amber_to_gmx-add_restraint.py [system] (0 for Convert AMBER to GROMACS; 1 Add position restraint and Generate position restraint file)
 ```
 
 ### 6. Pre-Equilibration Setup
@@ -105,8 +109,7 @@ The workflow generates:
 - Ligand parameter files in `ligprep/`
 - Force field parameters in `parameters/`
 - MD configuration files in `mdp/`
-- Restraint files
-- Pre-equilibration setup files
+
 
 ## Troubleshooting
 1. **No system directories found**:
@@ -117,7 +120,7 @@ The workflow generates:
 
 3. **Script failures**:
    - Check the log output for specific error messages
-   - Ensure all required software (AMBER, GROMACS) is properly installed
+   - Ensure all required software ( GROMACS) is properly installed
 
 ## Logging
 The script generates detailed logs showing:
@@ -132,7 +135,7 @@ The script generates detailed logs showing:
 4. Monitor disk space as temporary files can be large
 
 ## Support
-For issues or questions, please contact the author: Chaoyue Xia
+For issues or questions, please contact the authors
 
 ## Version
 Release: 2025-03-30
