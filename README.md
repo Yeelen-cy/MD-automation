@@ -22,7 +22,7 @@ project_root/
 │   ├── system1.pdb   # Initial Protein
 │   ├── ligprep/      # Auto-created for ligand prep files
 │   ├── parameters/   # Auto-created for parameter files
-│   └── mdp/          # Auto-created for MD parameter files
+│   └── mdp/          # Users need to prepare the required parameter files in advance
 └── ...               # Additional system folders
 ```
 
