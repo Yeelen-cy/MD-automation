@@ -1,42 +1,35 @@
-# Function: Generate Amber parameter files using tleap
-# Usage: python md_parm_gen.py [system] (0 for protein-only; 1 for complex)
-# Required files:
-#           (1) Ligand parameter files: lig.prep and lig.frcmod (for mode 1)
-#           (2) Ligand structure file: lig.pdb (for mode 1)
-#           (3) Protein structure file: pro.pdb (modes 0 and 1)
-# Author: zhouzhaoyin@simm.ac.cn
-# Released: 2025-02-26
-# Updata record: 
-# 2025-03-17: Unified work path
+"""
+Function: Generate Amber parameter files using tleap for all system folders.
+Usage: python md_parm_gen.py
+Author: zhouzhaoyin@simm.ac.cn
+Released: 2025-02-26
+Updata record: 
+  2025-03-17: Unified work path
+  2025-03-30: Automatically identify all system folders and process them conditionally + automatically identify protein/complex systems
+"""
 
 import os
 import sys
 import subprocess
 import re
 
-# Define fixed output directory (relative path: system1/parameters)
-OUTPUT_DIR = os.path.join("system1", "parameters")
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-def run_tleap(input_file):
-    """Execute tleap in the specified output directory and capture its output.
-    
-    All generated files (e.g., leap.log) will be created in OUTPUT_DIR.
+def run_tleap(input_file, output_dir):
+    """在指定输出目录中执行 tleap，并捕获其输出。
+    生成的所有文件（例如 leap.log）将存储在 output_dir 中。
     """
     try:
         subprocess.run(["tleap", "-f", input_file],
                        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                       cwd=OUTPUT_DIR)
+                       cwd=output_dir)
     except subprocess.CalledProcessError as e:
-        print(f"tleap execution failed: {e}")
+        print(f"tleap execution failed in {output_dir}: {e}")
         sys.exit(1)
 
 def parse_charge_from_log(log_file):
-    """Extract the system charge from leap.log.
-    
-    This function searches for a line formatted as:
+    """从 leap.log 文件中提取系统电荷。
+    搜索类似于：
         Total unperturbed charge:  <value>
-    and returns the extracted charge as a float.
+    的行，并返回提取的电荷值（float）。
     """
     charge = None
     if not os.path.exists(log_file):
@@ -53,36 +46,34 @@ def parse_charge_from_log(log_file):
         sys.exit(1)
     return charge
 
-def prepare_protein():
-    """Process a protein-only system:
-    
-    1. Generate a test tleap input script to calculate the protein charge.
-    2. Create a full tleap input script that:
-       - Loads the protein structure (../system1.pdb)
-       - Saves the dry parameters (pro.prmtop, pro.inpcrd, pro-dry.pdb)
-       - Solvates the system using a 10 Å OPC water box
-       - Adds ions for charge neutralization (Cl- for positive charge, Na+ for negative charge)
-       - Saves the solvated parameters (pro-sol.* files)
+def prepare_protein(base_dir, pdb_filename):
+    """处理蛋白质单体体系：
+    1. 生成测试 tleap 输入脚本计算蛋白电荷。
+    2. 生成完整 tleap 输入脚本，加载蛋白 PDB 文件、保存干体系文件、进行溶剂化和离子添加，
+       最后保存溶剂化后的文件。
        
-    All generated files are saved in OUTPUT_DIR.
+    所有生成的文件均保存在 base_dir/parameters 文件夹下。
     """
-    # Generate a test script for charge calculation.
-    # Note: The working directory is OUTPUT_DIR, so the protein PDB file path is adjusted.
-    test_file = os.path.join(OUTPUT_DIR, "tleap_protein_test.in")
+    output_dir = os.path.join(base_dir, "parameters")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # 生成测试脚本以计算电荷
+    test_file = os.path.join(output_dir, "tleap_protein_test.in")
+    # 因为 parameters 文件夹位于 base_dir 内，所以 PDB 文件路径为 "../<pdb_filename>"
     with open(test_file, "w") as f:
         f.write(
             "source leaprc.protein.ff19SB\n"
             "source leaprc.water.opc\n\n"
-            "pro = loadpdb ../system1.pdb\n"  # Adjusted path to the protein PDB file
+            f"pro = loadpdb ../{pdb_filename}\n"
             "charge pro\n"
             "quit\n"
         )
-    print("Running tleap for protein charge test...")
-    run_tleap("tleap_protein_test.in")  # File name is relative to OUTPUT_DIR
-    charge = parse_charge_from_log(os.path.join(OUTPUT_DIR, "leap.log"))
-    print(f"Detected protein system charge: {charge}")
+    print(f"[{base_dir}] Running tleap for protein charge test...")
+    run_tleap("tleap_protein_test.in", output_dir)
+    charge = parse_charge_from_log(os.path.join(output_dir, "leap.log"))
+    print(f"[{base_dir}] Detected protein system charge: {charge}")
 
-    # Determine ion type and count based on the calculated charge.
+    # 根据电荷决定添加离子
     ion = None
     nion = 0
     if charge > 0:
@@ -92,17 +83,17 @@ def prepare_protein():
         ion = "Na+"
         nion = int(round(-charge))
     if ion and nion > 0:
-        print(f"Adding {nion} {ion} ions to neutralize the system.")
+        print(f"[{base_dir}] Adding {nion} {ion} ions to neutralize the system.")
     else:
-        print("System is neutral - no ions required.")
+        print(f"[{base_dir}] System is neutral - no ions required.")
 
-    # Generate the full tleap script for processing the protein system.
-    full_file = os.path.join(OUTPUT_DIR, "tleap_protein.in")
+    # 生成完整的 tleap 脚本
+    full_file = os.path.join(output_dir, "tleap_protein.in")
     with open(full_file, "w") as f:
         f.write(
             "source leaprc.protein.ff19SB\n"
             "source leaprc.water.opc\n\n"
-            "pro = loadpdb ../system1.pdb\n\n"  # Adjusted path to the protein PDB file
+            f"pro = loadpdb ../{pdb_filename}\n\n"
             "saveamberparm pro pro.prmtop pro.inpcrd\n"
             "savepdb pro pro-dry.pdb\n\n"
             "charge pro\n"
@@ -117,51 +108,48 @@ def prepare_protein():
             "savepdb pro pro-sol.pdb\n"
             "quit\n"
         )
+    print(f"[{base_dir}] Processing protein system (solvation and ion addition)...")
+    run_tleap("tleap_protein.in", output_dir)
+    print(f"[{base_dir}] Protein system processing completed. Generated files in: {output_dir}")
+    print(f"  Dry topology: pro.prmtop")
+    print(f"  Dry coordinates: pro.inpcrd")
+    print(f"  Dry structure: pro-dry.pdb")
+    print(f"  Solvated topology: pro-sol.prmtop")
+    print(f"  Solvated coordinates: pro-sol.inpcrd")
+    print(f"  Solvated structure: pro-sol.pdb")
 
-    print("Processing protein system (solvation and ion addition)...")
-    run_tleap("tleap_protein.in")
-    print("Protein system processing completed. Generated files in:", OUTPUT_DIR)
-    print("  Dry topology: pro.prmtop")
-    print("  Dry coordinates: pro.inpcrd")
-    print("  Dry structure: pro-dry.pdb")
-    print("  Solvated topology: pro-sol.prmtop")
-    print("  Solvated coordinates: pro-sol.inpcrd")
-    print("  Solvated structure: pro-sol.pdb")
-
-def prepare_complex():
-    """Process a protein-ligand complex system:
-    
-    1. Generate a test tleap input script to calculate the complex system charge.
-    2. Create a full tleap input script that:
-       - Loads protein and ligand parameters.
-       - Saves individual components and the combined system.
-       - Solvates the complex using a 10 Å OPC water box.
-       - Adds ions for charge neutralization.
-       - Saves the final parameter files.
+def prepare_complex(base_dir, pdb_filename):
+    """处理蛋白-配体复合体系：
+    1. 生成测试 tleap 输入脚本计算复合体系电荷。
+    2. 生成完整 tleap 脚本，加载蛋白和配体参数、保存各组分及复合体系，
+       进行溶剂化和离子添加，最后保存生成的 Amber 参数文件。
        
-    All generated files are saved in OUTPUT_DIR.
+    所有生成的文件均保存在 base_dir/parameters 文件夹下。
     """
-    # Generate a test script for charge calculation of the complex.
-    test_file = os.path.join(OUTPUT_DIR, "tleap_complex_test.in")
+    output_dir = os.path.join(base_dir, "parameters")
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # 生成测试脚本以计算电荷
+    test_file = os.path.join(output_dir, "tleap_complex_test.in")
     with open(test_file, "w") as f:
         f.write(
             "source leaprc.protein.ff19SB\n"
             "source leaprc.gaff2\n"
             "source leaprc.water.opc\n\n"
-            "loadamberparams ../ligprep/lig.frcmod\n"    # Adjusted path to the ligand frcmod file
-            "loadamberprep ../ligprep/lig.prep\n\n"       # Adjusted path to the ligand prep file
-            "mol = loadpdb ../ligprep/LIG.PDB\n"            # Adjusted path to the ligand PDB file
-            "pro = loadpdb ../system1.pdb\n"                # Adjusted path to the protein PDB file
+            "loadamberparams ../ligprep/lig.frcmod\n"    # ligand frcmod
+            "loadamberprep ../ligprep/lig.prep\n\n"       # ligand prep
+            "mol = loadpdb ../ligprep/LIG.PDB\n"            # ligand PDB
+            f"pro = loadpdb ../{pdb_filename}\n"            # protein PDB
             "com = combine {pro mol}\n\n"
             "charge com\n"
             "quit\n"
         )
-    print("Running tleap for complex charge test...")
-    run_tleap("tleap_complex_test.in")
-    charge = parse_charge_from_log(os.path.join(OUTPUT_DIR, "leap.log"))
-    print(f"Detected complex system charge: {charge}")
+    print(f"[{base_dir}] Running tleap for complex charge test...")
+    run_tleap("tleap_complex_test.in", output_dir)
+    charge = parse_charge_from_log(os.path.join(output_dir, "leap.log"))
+    print(f"[{base_dir}] Detected complex system charge: {charge}")
 
-    # Determine ion type and count based on the calculated charge.
+    # 根据电荷决定添加离子
     ion = None
     nion = 0
     if charge > 0:
@@ -171,21 +159,21 @@ def prepare_complex():
         ion = "Na+"
         nion = int(round(-charge))
     if ion and nion > 0:
-        print(f"Adding {nion} {ion} ions for neutralization.")
+        print(f"[{base_dir}] Adding {nion} {ion} ions for neutralization.")
     else:
-        print("Complex system is neutral - no ions required.")
+        print(f"[{base_dir}] Complex system is neutral - no ions required.")
 
-    # Generate the full tleap script for processing the complex system.
-    full_file = os.path.join(OUTPUT_DIR, "tleap_complex.in")
+    # 生成完整的 tleap 脚本
+    full_file = os.path.join(output_dir, "tleap_complex.in")
     with open(full_file, "w") as f:
         f.write(
             "source leaprc.protein.ff19SB\n"
             "source leaprc.gaff2\n"
             "source leaprc.water.opc\n\n"
-            "loadamberparams ../ligprep/lig.frcmod\n"    # Adjusted path to the ligand frcmod file
-            "loadamberprep ../ligprep/lig.prep\n\n"       # Adjusted path to the ligand prep file
-            "mol = loadpdb ../ligprep/LIG.PDB\n"            # Adjusted path to the ligand PDB file
-            "pro = loadpdb ../system1.pdb\n"                # Adjusted path to the protein PDB file
+            "loadamberparams ../ligprep/lig.frcmod\n"    # ligand frcmod
+            "loadamberprep ../ligprep/lig.prep\n\n"       # ligand prep
+            "mol = loadpdb ../ligprep/LIG.PDB\n"            # ligand PDB
+            f"pro = loadpdb ../{pdb_filename}\n"            # protein PDB
             "com = combine {pro mol}\n\n"
             "saveamberparm pro pro.prmtop pro.inpcrd\n"
             "saveamberparm mol lig.prmtop lig.inpcrd\n"
@@ -202,9 +190,9 @@ def prepare_complex():
             "savepdb com com.pdb\n"
             "quit\n"
         )
-    print("Processing complex system (solvation and ion addition)...")
-    run_tleap("tleap_complex.in")
-    print("Complex system processing completed. Generated files in:", OUTPUT_DIR)
+    print(f"[{base_dir}] Processing complex system (solvation and ion addition)...")
+    run_tleap("tleap_complex.in", output_dir)
+    print(f"[{base_dir}] Complex system processing completed. Generated files in: {output_dir}")
     print("  Protein topology: pro.prmtop")
     print("  Protein coordinates: pro.inpcrd")
     print("  Ligand topology: lig.prmtop")
@@ -216,22 +204,50 @@ def prepare_complex():
     print("  Solvated coordinates: complex.inpcrd")
     print("  Solvated structure: com.pdb")
 
-def main():
-    """Main execution based on the command line argument:
-    
-    0: Protein-only system
-    1: Protein-ligand complex system
+def process_system(system_dir):
     """
-    if len(sys.argv) != 2 or sys.argv[1] not in ["0", "1"]:
-        print("Usage: python md_parm_gen.py 0   # Protein-only")
-        print("       python md_parm_gen.py 1   # Protein-ligand complex")
-        sys.exit(1)
+    检查 system_dir 文件夹是否满足处理条件：
+    1. 在 system_dir 根目录下找到一个 PDB 文件（排除 ligprep 文件夹中的文件）
+    2. 如果 system_dir 下存在 ligprep 子文件夹，并且其中包含 lig.frcmod, lig.prep 和 LIG.PDB，
+       则认为是复合体系；否则为蛋白质单体体系。
+    根据检测结果调用相应的处理函数。
+    """
+    # 查找根目录下的 pdb 文件（排除文件夹）
+    pdb_files = [f for f in os.listdir(system_dir)
+                 if f.lower().endswith(".pdb") and os.path.isfile(os.path.join(system_dir, f))]
+    if not pdb_files:
+        print(f"[{system_dir}] 未找到 PDB 文件，跳过该文件夹。")
+        return
+    # 这里取第一个 pdb 文件作为蛋白质结构文件
+    pdb_filename = pdb_files[0]
+    
+    ligprep_dir = os.path.join(system_dir, "ligprep")
+    is_complex = False
+    if os.path.isdir(ligprep_dir):
+        required_files = {"lig.frcmod", "lig.prep", "LIG.PDB"}
+        available = set(os.listdir(ligprep_dir))
+        if required_files.issubset(available):
+            is_complex = True
 
-    mode = sys.argv[1]
-    if mode == "0":
-        prepare_protein()
-    elif mode == "1":
-        prepare_complex()
+    print(f"[{system_dir}] 检测到 PDB 文件：{pdb_filename}")
+    if is_complex:
+        print(f"[{system_dir}] 检测到完整的 ligprep 文件夹，按照蛋白-配体复合体系处理。")
+        prepare_complex(system_dir, pdb_filename)
+    else:
+        print(f"[{system_dir}] 未检测到 ligprep 或缺失必要文件，按照蛋白质单体体系处理。")
+        prepare_protein(system_dir, pdb_filename)
+
+def main():
+    """自动扫描当前目录下所有以 'system' 开头的文件夹，并对满足条件的文件夹进行处理。"""
+    base_path = os.getcwd()
+    dirs = [d for d in os.listdir(base_path) if os.path.isdir(d) and d.startswith("system")]
+    if not dirs:
+        print("未找到以 'system' 开头的文件夹。")
+        sys.exit(1)
+    
+    for d in dirs:
+        system_dir = os.path.join(base_path, d)
+        process_system(system_dir)
 
 if __name__ == "__main__":
     main()
