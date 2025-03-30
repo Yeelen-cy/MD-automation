@@ -3,7 +3,7 @@ import argparse
 import subprocess
 
 """
-写在最前面：由于高斯运行时的临时文件特别大且未正常结束时不会自动删除，切勿经常大批量kill高斯任务。
+写在最前面：由于高斯运行时的临时文件特别大，切勿经常大批量kill高斯任务。
 
 Usage:
     python lig_parameter_cal.py -i <input_directory> -t <file_type>
@@ -174,7 +174,12 @@ class BatchRun:
                 print(f"Skipping {filepath} due to antechamber failed.")
                 continue
             folder, file = os.path.split(gjf_file)
-            os.chdir(folder)
+            ligprep_folder = os.path.join(folder, "ligprep")
+            if not os.path.exists(ligprep_folder):
+                os.mkdir(ligprep_folder)
+            new_gjf_path = os.path.join(ligprep_folder, file)
+            os.rename(gjf_file, new_gjf_path)
+            os.chdir(ligprep_folder)
             # 提交 Gaussian 任务并获取 PID
             process = subprocess.Popen(f'nohup g16 {file} &', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
