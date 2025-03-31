@@ -1,13 +1,16 @@
 # Function：对齐高斯优化后的原子名称。
-# Usage：处理每个ligprep文件夹下的NEWPDB.PDB文件，使用ATOMTYPE.INF文件索引，
+# Usage：python atom_name_check.py
+#        处理每个ligprep文件夹下的NEWPDB.PDB文件，使用ATOMTYPE.INF文件索引，
 #        将NEWPDB.PDB文件中的原子坐标与systemX.sdf文件中的原子坐标对齐，
 #        对齐原子名称后生成的文件命名为LIG.PDB，分别储存在每一个ligprep文件夹中。
 # Required files:
-#            ATOMTYPE.INF
-#            NEWPDB.PDB
-#            systemX.sdf
+#        ATOMTYPE.INF
+#        NEWPDB.PDB
+#        systemX.sdf
+# Output files：
+#        LIG.PDB
 # Author: zhuziyu@simm.ac.cn
-# Released: 2025-03-30
+# Released: 2025-03-31
 
 # 引入需要用到的Python标准库
 import os       # 用于文件和目录操作，比如路径拼接、文件遍历等
