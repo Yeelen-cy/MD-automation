@@ -1,6 +1,11 @@
 """
 Function: Generate Amber parameter files using tleap for all system folders.
 Usage: python md_parm_gen.py
+# file needed: 
+# There is a folder starting with "system" in the script working path, which contains the "ligprep" folder, which contains the following files：
+#           (1) ligand parameter file: lig.prep and lig.frcmod
+#           (2) ligand strcture file: lig.pdb
+#           (3) protein strcuture file: pro.pdb
 Author: zhouzhaoyin@simm.ac.cn
 Released: 2025-02-26
 Updata record: 
@@ -42,7 +47,7 @@ def parse_charge_from_log(log_file):
                 charge = float(m.group(1))
                 break
     if charge is None:
-        print("Error: Failed to parse system charge from leap.log.")
+        print("Error: Failed to parse  charge from leap.log.")
         sys.exit(1)
     return charge
 
@@ -71,7 +76,7 @@ def prepare_protein(base_dir, pdb_filename):
     print(f"[{base_dir}] Running tleap for protein charge test...")
     run_tleap("tleap_protein_test.in", output_dir)
     charge = parse_charge_from_log(os.path.join(output_dir, "leap.log"))
-    print(f"[{base_dir}] Detected protein system charge: {charge}")
+    print(f"[{base_dir}] Detected protein  charge: {charge}")
 
     # 根据电荷决定添加离子
     ion = None
@@ -83,9 +88,9 @@ def prepare_protein(base_dir, pdb_filename):
         ion = "Na+"
         nion = int(round(-charge))
     if ion and nion > 0:
-        print(f"[{base_dir}] Adding {nion} {ion} ions to neutralize the system.")
+        print(f"[{base_dir}] Adding {nion} {ion} ions to neutralize the .")
     else:
-        print(f"[{base_dir}] System is neutral - no ions required.")
+        print(f"[{base_dir}]  is neutral - no ions required.")
 
     # 生成完整的 tleap 脚本
     full_file = os.path.join(output_dir, "tleap_protein.in")
@@ -108,9 +113,9 @@ def prepare_protein(base_dir, pdb_filename):
             "savepdb pro pro-sol.pdb\n"
             "quit\n"
         )
-    print(f"[{base_dir}] Processing protein system (solvation and ion addition)...")
+    print(f"[{base_dir}] Processing protein  (solvation and ion addition)...")
     run_tleap("tleap_protein.in", output_dir)
-    print(f"[{base_dir}] Protein system processing completed. Generated files in: {output_dir}")
+    print(f"[{base_dir}] Protein  processing completed. Generated files in: {output_dir}")
     print(f"  Dry topology: pro.prmtop")
     print(f"  Dry coordinates: pro.inpcrd")
     print(f"  Dry structure: pro-dry.pdb")
@@ -147,7 +152,7 @@ def prepare_complex(base_dir, pdb_filename):
     print(f"[{base_dir}] Running tleap for complex charge test...")
     run_tleap("tleap_complex_test.in", output_dir)
     charge = parse_charge_from_log(os.path.join(output_dir, "leap.log"))
-    print(f"[{base_dir}] Detected complex system charge: {charge}")
+    print(f"[{base_dir}] Detected complex  charge: {charge}")
 
     # 根据电荷决定添加离子
     ion = None
