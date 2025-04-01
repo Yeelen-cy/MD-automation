@@ -1,0 +1,24 @@
+source leaprc.protein.ff19SB
+source leaprc.gaff2
+source leaprc.water.opc
+
+loadamberparams ../ligprep/lig.frcmod
+loadamberprep ../ligprep/lig.prep
+
+mol = loadpdb ../ligprep/LIG.PDB
+pro = loadpdb ../system1.pdb
+com = combine {pro mol}
+
+saveamberparm pro pro.prmtop pro.inpcrd
+saveamberparm mol lig.prmtop lig.inpcrd
+saveamberparm com native.prmtop native.inpcrd
+savepdb com com-dry.pdb
+
+charge com
+solvatebox com OPCBOX 10
+addionsrand com Na+ 9
+charge com
+
+saveamberparm com complex.prmtop complex.inpcrd
+savepdb com com.pdb
+quit

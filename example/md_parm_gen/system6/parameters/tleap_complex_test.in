@@ -1,0 +1,13 @@
+source leaprc.protein.ff19SB
+source leaprc.gaff2
+source leaprc.water.opc
+
+loadamberparams ../ligprep/lig.frcmod
+loadamberprep ../ligprep/lig.prep
+
+mol = loadpdb ../ligprep/LIG.PDB
+pro = loadpdb ../system1.pdb
+com = combine {pro mol}
+
+charge com
+quit
