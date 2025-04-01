@@ -1,11 +1,13 @@
 """
 Function: Generate Amber parameter files using tleap for all system folders.
 Usage: python md_parm_gen.py
-# file needed: 
-# There is a folder starting with "system" in the script working path, which contains the "ligprep" folder, which contains the following files：
-#           (1) ligand parameter file: lig.prep and lig.frcmod
-#           (2) ligand strcture file: lig.pdb
-#           (3) protein strcuture file: pro.pdb
+############################################################################ README ############################################################################
+# We need at least one folder starting with "system" in the script working path, which contains the pdb file (Receptor structure file).
+# If no 'ligprep' folder detected or necessary files missing, treat as apo system.
+# For complex system, we need the "ligprep" folder, which contains the following files：
+#           (1) ligand strcture file: lig.pdb
+#           (2) ligand parameter file: lig.prep and lig.frcmod
+############################################################################ README ############################################################################
 Author: zhouzhaoyin@simm.ac.cn
 Released: 2025-02-26
 Updata record: 
