@@ -55,7 +55,11 @@ The complete workflow executes these steps in order:
 
 4. **MD Parameter Generation** (`md_parm_gen.py`)
    - Generates amber field parameters for the system
-   - Different handling for protein-only vs. complex systems
+   - We need at least one folder starting with "system" in the script working path, which contains the pdb file (Receptor structure file).
+   - If no 'ligprep' folder detected or necessary files missing, treat as apo system.
+   - For complex system, we need the "ligprep" folder, which contains the following files：
+   -          (1) ligand strcture file: lig.pdb
+   -          (2) ligand parameter file: lig.prep and lig.frcmod
 
 5. **AMBER to GROMACS Conversion** (`amber_to_gmx-add_restraint.py`)
    - Converts parameters to GROMACS format
