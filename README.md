@@ -55,11 +55,7 @@ The complete workflow executes these steps in order:
 
 4. **MD Parameter Generation** (`md_parm_gen.py`)
    - Generates amber field parameters for the system
-   - We need at least one folder starting with "system" in the script working path, which contains the pdb file (Receptor structure file).
-   - If no 'ligprep' folder detected or necessary files missing, treat as apo system.
-   - For complex system, we need the "ligprep" folder, which contains the following files：
-   -          (1) ligand strcture file: lig.pdb
-   -          (2) ligand parameter file: lig.prep and lig.frcmod
+   - Automatically identifying protein or complex systems （depends on whether all files for the ligand exist）
 
 5. **AMBER to GROMACS Conversion** (`amber_to_gmx-add_restraint.py`)
    - Converts parameters to GROMACS format
@@ -89,8 +85,34 @@ python atom_name_check.py
 
 ### 4. MD Parameter Generation
 ```bash
-python md_parm_gen.py [0|1]
-# 0 for protein-only, 1 for complex
+python md_parm_gen.py
+# Input file:
+We need at least one folder starting with "system" in the script working path, which contains the pdb file (Receptor structure file).
+If no 'ligprep' folder detected or necessary files missing, treat as apo system.
+For complex system, we need the "ligprep" folder, which contains the following files：
+          (1) ligand strcture file: lig.pdb
+          (2) ligand parameter file: lig.prep and lig.frcmod
+
+# Output file:
+For apo system, you will get:
+  Dry topology: pro.prmtop
+  Dry coordinates: pro.inpcrd
+  Dry structure: pro-dry.pdb
+  Solvated topology: pro-sol.prmtop
+  Solvated coordinates: pro-sol.inpcrd
+  Solvated structure: pro-sol.pdb
+
+For complex system, you will get:
+  Protein topology: pro.prmtop
+  Protein coordinates: pro.inpcrd
+  Ligand topology: lig.prmtop
+  Ligand coordinates: lig.inpcrd
+  Dry complex structure: com-dry.pdb
+  Native complex topology: native.prmtop
+  Native coordinates: native.inpcrd
+  Solvated topology: complex.prmtop
+  Solvated coordinates: complex.inpcrd
+  Solvated structure: com.pdb
 ```
 
 ### 5. AMBER to GROMACS Conversion
