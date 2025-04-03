@@ -123,6 +123,18 @@ python amber_to_gmx-add_restraint.py [system] (0 for Convert AMBER to GROMACS; 1
 ### 6. Pre-Equilibration Setup
 ```bash
 python pre_equ.py
+
+# Required Files
+Before running the script, ensure that the necessary input files are properly placed in the correct directories.
+1. MD Parameter Files (MDP)
+The required .mdp parameter files must be sourced from:
+example/pre-equ/system/mdp
+These files contain essential settings for the equilibration process.
+2. Input Structure and Topology Files
+Each system must have the following files stored in the parameters directory:
+gmx.top: The topology file describing the molecular system.
+gmx.gro: The initial coordinate file for the system.
+.itp: The position restraints file to stabilize the system during equilibration.
 ```
 
 ## Input File Requirements
