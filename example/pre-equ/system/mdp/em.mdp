@@ -1,0 +1,18 @@
+define          = -DPOSRES ; position restrain the protein
+integrator               = steep
+nsteps                   = 50000
+emtol                    = 10
+emstep                   = 0.01
+nstxout                  = 500
+nstenergy                = 500
+constraints              = hbonds
+ns_type         = grid          ; search neighboring grid cels
+nstlist         = 5                 ; 10 fs
+rlist           = 1.0           ; short-range neighborlist cutoff (in nm)
+rcoulomb        = 1.0           ; short-range electrostatic cutoff (in nm)
+rvdw            = 1.0           ; short-range van der Waals cutoff (in nm)
+; Electrostatics
+coulombtype     = PME           ; Particle Mesh Ewald for long-range electrostatics
+pme_order       = 4                 ; cubic interpolation
+fourierspacing  = 0.16          ; grid spacing for FFT
+

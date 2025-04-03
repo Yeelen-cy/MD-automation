@@ -1,0 +1,44 @@
+title           = NPT Equilibration
+define          = -DPOSRES ; position restrain the protein
+; Run parameters
+integrator     = md
+
+dt              = 0.002
+nsteps          = 100000  ; 200ps
+
+constraints     = hbonds
+constraint_algorithm = lincs    	; holonomic constraints
+nstvout         = 0
+nstxout-compressed   = 1000
+
+;xtc_grps        = Protein
+nstlog          = 1000
+nstenergy       = 1000
+nstcomm           = 5			; frequency for center of mass motion removal
+nstlist           = 20			; frequency to update the neighbor list. With parallel 
+					; simulations and/or nonbonded force calculation, a value of
+					; 20 or 40 often gives the best performance.
+ns_type           = grid
+
+rlist             = 1.0
+coulombtype       = PME
+rcoulomb          = 1.0
+vdwtype           = cut-off
+rvdw              = 1.0
+DispCorr          = EnerPres
+
+Tcoupl              = v-rescale
+tc_grps             = system
+tau_t               =  0.1   
+ref_t               =  300.00
+
+;Pressure coupling is off in NVT simulations
+Pcoupl              = no
+
+; Periodic boundary conditions
+pbc                 = xyz               ; 3-D PBC
+
+gen_vel             = no		; Do not generate velocities
+continuation    = yes 			; useful for exact continuation and reruns
+gen_temp            = 300.00		; temperature for Maxwell distribution 
+gen_seed            =  -1		; a pseudo random seed is used
