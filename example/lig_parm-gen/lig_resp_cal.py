@@ -45,8 +45,8 @@ class ParaMeterInfo:
         folder, file = os.path.split(filepath)
         os.chdir(folder)
         log_file = os.path.splitext(filepath)[0] + '.log'
-        prep_file = os.path.splitext(filepath)[0] + '.prep'
-        frcmod_file = os.path.splitext(filepath)[0] + '.frcmod'
+        prep_file = 'lig.prep'
+        frcmod_file = 'lig.frcmod'
 
         command_antechamber = f'antechamber -i {log_file} -fi gout -o {prep_file} -fo prepi -c resp'
         command_parmchk = f'parmchk2 -i {prep_file} -f prepi -o {frcmod_file} -a y'
