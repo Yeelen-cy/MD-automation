@@ -45,6 +45,7 @@ The complete workflow executes these steps in order:
 1. **Ligand Parameter Calculation** (`lig_parameter_cal.py`)
    - Processes all .sdf files in system directories
    - Generates initial ligand parameters
+   - Submits Gaussian jobs in batch
 
 2. **RESP Charge Calculation** (`lig_resp_cal.py`)
    - Charge calculation
@@ -71,11 +72,32 @@ Each step can be run independently if needed:
 ### 1. Ligand Parameter Calculation
 ```bash
 python lig_parameter_cal.py -i <input_directory> -t <file_type>
+# Processes files and Submits Gaussian jobs
+python lig_parameter_cal.py -c -i <input_directory>
+# Monitors Gaussian jobs
+
+# Input file:
+  Ligand structure file: XXX.sdf/mol/pdb
+  We need at least one folder starting with "system" in the script working path, which contains the SDF, MOL, or PDB file (Ligand structure file).
+  Gaussian jobs can be submitted using the first command, and the terminal will display the PID of each submitted job. After submission, the second command can be used to monitor the status of these jobs.
+  If any jobs fail, we can check the error messages and re-run the first command. It will automatically resubmit the corresponding Gaussian .gjf files that do not have associated .log files.
+ 
+# Output file:
+In the "ligprep" folder, you will get:
+  Guassian input file: XXX.gjf
+  Guassian output file: XXX.log
 ```
 
 ### 2. RESP Charge Calculation
 ```bash
 python script_name.py -i <input_directory>
+
+# Input file:
+  Guassian output file: XXX.log (a successful job ends with "Normal termination" at the end of the file)
+
+# Output file:
+   (1) ligand strcture file: lig.pdb
+   (2) ligand parameter file: lig.prep and lig.frcmod
 ```
 
 ### 3. Atom Name Validation
