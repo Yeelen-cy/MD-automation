@@ -1,4 +1,4 @@
-### 此脚本的输入：lig_parm-gen部分优化的结果，MD-automation/example/lig_parm-gen/system13/下三个文件
+### 输入：lig_parm-gen部分优化的结果，MD-automation/example/lig_parm-gen/system13/下三个文件
 ###              NEVPDB.PDB
 ###              ATOMTYPE.INF
 ###             systemX.sdf
