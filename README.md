@@ -103,6 +103,14 @@ python script_name.py -i <input_directory>
 ### 3. Atom Name Validation
 ```bash
 python atom_name_check.py
+
+# Input file:
+  Ligand structure file: XXX.sdf
+  The file generated in the previous step:NEWPDB.PDB
+  The file generated in the previous step contains the atomic mapping relationships：ATOMTYPE.INF
+
+# Output files：
+  The file containing the correct atomic coordinate information:LIG.PDB
 ```
 
 ### 4. MD Parameter Generation
