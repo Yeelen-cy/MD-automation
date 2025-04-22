@@ -60,7 +60,7 @@ The complete workflow executes these steps in order:
 
 5. **AMBER to GROMACS Conversion** (`amber_to_gmx-add_restraint.py`)
    - Converts parameters to GROMACS format
-   - Adds necessary restraints
+   - Adds necessary restraints and generate position restraint file
 
 6. **Pre-Equilibration Setup** (`pre_equ.py`)
    - Prepares files for system equilibration
@@ -147,7 +147,33 @@ For complex system, you will get:
 
 ### 5. AMBER to GROMACS Conversion
 ```bash
-python amber_to_gmx-add_restraint.py [system] (0 for Convert AMBER to GROMACS; 1 Add position restraint and Generate position restraint file)
+# Usage:
+     python amber_to_gmx-add_restraint.py [mode]
+     mode = 0 → Convert AMBER to GROMACS
+     mode = 1 → Adds necessary restraints and generate position restraint file
+
+# Required files:
+    For mode 0 (AMBER → GROMACS):
+         (1) AMBER coordinate file: complex.inpcrd
+         (2) AMBER topology file: complex.prmtop
+     For mode 1 (Add restraints):
+         (1) GROMACS topology file: gmx.top
+
+# Output files:
+     For mode 0:
+         GROMACS topology file: gmx.top
+         GROMACS coordinate file: gmx.gro
+     For mode 1:
+         GROMACS topology file with restraint entries: gmx.top
+         GROMACS coordinate file: gmx.gro
+         Position restraint file: posre.itp
+
+# Tip:
+     - If you only need the basic GROMACS topology and coordinate files (gmx.top and gmx.gro),
+       simply run: python amber_to_gmx-add_restraint.py 0
+     - If you also want to generate a position restraint file, directly run:
+       python amber_to_gmx-add_restraint.py 1
+       This command will automatically generate gmx.top, gmx.gro, and posre.itp.
 ```
 
 ### 6. Pre-Equilibration Setup
